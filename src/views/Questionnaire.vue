@@ -5,7 +5,7 @@
 
 <template>
     
-<p>test</p>
+<button @click="this.$router.push('/QuestionnaireContent')">表單頁</button>
 
 </template>
 

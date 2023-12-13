@@ -12,7 +12,7 @@ const router = createRouter({
       path:'/QuestionnaireContent',
       name:'QuestionnaireContent',
       component:() => import('../views/QuestionnaireContent.vue')
-    }
+    },
   ]
 })
 

@@ -1,49 +1,310 @@
 <template>
     <div class="main">
-        <div class="content">
-            <div class="questionnaireTitleArea">
-                <p>問卷名稱:</p>
-            </div>
-            <div class="questionnaireInformationArea">
+        <div class="outer">
+            <div class="tabs">
+                <input type="radio" id="tab-1" name="tab" checked="checked">
+                <label for="tab-1">問卷</label>
+                <div class="tab-content">
+                    <div class="information">
+                        <div class="information_inside_area_1">
+                            <p class="form_name_text form_information_text">問卷名稱：</p>
+                            <input class="form_name_input form_input">
+                        </div>
+                        <div class="information_inside_area_2">
+                            <p class="form_description_text form_information_text">問卷說明：</p>
+                            <textarea class="form_description_input form_input"></textarea>
+                        </div>
+                        <div class="information_inside_area_3">
+                            <p class="form_startTime_text form_information_text">開始時間：</p>
+                            <input type="date" class="form_startTime_input form_input">
+                        </div>
+                        <div class="information_inside_area_4">
+                            <p class="form_endTime_text form_information_text">結束時間：</p>
+                            <input type="date" class="form_endTime_input form_input">
+                        </div>
+                        <div class="information_inside_area_5">
+                            <button class="form_cancel_button font_button">取消</button>
+                            <button class="form_next_button font_button">下一步</button>
+                        </div>
+                    </div>
+                </div>
+                <!--   tab group end -->
 
-            </div>
-            <div class="questionnaireStartTimeArea">
+                <!--   tab group -->
+                <input type="radio" name="tab" id="tab-2">
+                <label for="tab-2">題目</label>
+                <div class="tab-content">
+                    <div class="quiz">
+                        <div class="quiz_inside_area_1">
+                            <p class="form_quiz_text quiz_text">問題：</p>
+                            <input class="form_quiz_input quiz_title">
+                            <select id="quiz_type_select" class="quiz_type_select" @change="quizTypeChange()">
+                                <option v-for="item in quizTypeList" :value="item[1]">{{ item[0] }}</option>
+                            </select>
+                        </div>
+                        <p class="form_quiz_text">選項：</p>
+                        <div class="quiz_inside_area_2">
+                            <div class="quiz_div" v-if="selectedQuizType == 'radio'">
+                                <div class="quiz_type_radio_div">
+                                    <input class="quiz_answer_input" v-for="(item, index) in answerList"
+                                        v-model="answerList[index]" @input="check()">
+                                        <button class="add_answer_button" @click="addAnswer()">增加選項</button>
+                                </div>
+                            </div>
+                            <div class="quiz_div" v-if="selectedQuizType == 'checkBox'">
+                                <div class="quiz_type_checkBox_div">
+                                    <input class="quiz_answer_input" v-for="(item, index) in answerList"
+                                        v-model="answerList[index]" @input="check()">
+                                        <button class="add_answer_button" @click="addAnswer()">增加選項</button>
+                                </div>
+                            </div>
+                            <div class="quiz_type_textArea_div" v-if="selectedQuizType == 'textArea'">
 
-            </div>
-            <div class="questionnaireEndTimeArea">
+                            </div>
 
-            </div>
-            <div class="questionnaireButtonArea">
+                        </div>
+                        <div class="quiz_inside_area_3">
 
+                        </div>
+                        <div class="quiz_inside_area_4">
+
+                        </div>
+                    </div>
+                </div>
+                <!--   tab group end -->
+
+                <!--   tab group -->
+                <input type="radio" name="tab" id="tab-3">
+                <label for="tab-3">問卷回饋</label>
+                <div class="tab-content">Content 3</div>
+
+                <input type="radio" name="tab" id="tab-4">
+                <label for="tab-4">統計</label>
+                <div class="tab-content">Content 4</div>
             </div>
         </div>
     </div>
 </template>
 
-<script>
-export default{
-    data(){
-        return{
+<style scoped lang="scss">
+.main {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
 
+    .outer {
+        width: 100%;
+        height: 100%;
+
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            column-gap: 5px;
+            margin: 2em auto;
+            width: 50%;
+
+
+            input[type="radio"] {
+                display: none;
+
+                &:checked {
+                    +label {
+                        color: black;
+                        background-color: white;
+                        transform: translatey(1px);
+
+                        +.tab-content {
+                            display: block;
+                        }
+                    }
+                }
+            }
+
+            label {
+                padding: 0.5em 0.75em;
+                color: #ccc;
+                border: 1px solid #ccc;
+                border-bottom: unset;
+                border-top-left-radius: 5px;
+                border-top-right-radius: 5px;
+                cursor: pointer;
+                order: 0;
+
+                &:hover {
+                    color: black;
+                }
+            }
+
+            .tab-content {
+                width: 100%;
+                display: none;
+                padding: 1em;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                order: 1;
+
+                .information {
+                    .form_information_text {
+                        margin: 0;
+                        margin-top: 20px;
+                        margin-right: 10px;
+                        margin-left: 10px;
+                    }
+
+                    .form_input {
+                        margin-top: 20px;
+                        margin-right: 10px;
+                        margin-left: 10px;
+                    }
+
+                    .form_startTime_input {
+                        text-indent: 3%;
+                    }
+
+                    .form_endTime_input {
+                        text-indent: 3%;
+                    }
+
+                    .information_inside_area_1 {
+                        display: flex;
+                    }
+
+                    .information_inside_area_2 {
+                        display: flex;
+
+                        .form_description_input {
+                            height: 200px;
+                            width: 70%;
+                            resize: none;
+                        }
+                    }
+
+                    .information_inside_area_3 {
+                        display: flex;
+                    }
+
+                    .information_inside_area_4 {
+                        display: flex;
+                    }
+
+                    .information_inside_area_5 {
+                        display: flex;
+                        justify-content: end;
+                        align-items: center;
+
+                        .font_button {
+                            margin-right: 20px;
+                        }
+                    }
+                }
+
+                .quiz {
+                    .form_quiz_text {
+                        margin: 0;
+                        margin-left: 10px;
+                        margin-right: 10px;
+                        margin-top: 20px;
+                    }
+
+                    .quiz_inside_area_1 {
+                        display: flex;
+                        align-items: center;
+
+                        .quiz_title {
+                            height: 30px;
+                            margin-top: 20px;
+                            margin-right: 10px;
+                            margin-left: 10px;
+                        }
+                        .quiz_type_select{
+                            margin-top: 20px;
+                            margin-right: 10px;
+                            margin-left: 10px;
+                            height: 30px;
+                            
+                        }
+                    }
+
+                    .quiz_inside_area_2 {
+                        display: flex;
+
+                        .quiz_div {
+
+                            .quiz_type_radio_div {
+                                width: 100%;
+                                margin-left: 10px;
+
+                                .quiz_answer_input {
+                                    margin-top: 5px;
+                                    margin-right: 5px;
+                                }
+                            }
+
+                            .quiz_type_checkBox_div {
+                                width: 100%;
+                                margin-left: 10px;
+
+                                .quiz_answer_input {
+                                    margin-top: 5px;
+                                    margin-right: 5px;
+                                }
+                            }
+
+                            .quiz_type_textArea_div {
+                                width: 50%;
+                            }
+
+                            .add_answer_button {
+                                margin-top: 5px;
+                                margin-right: 5px;
+                                width: 180px;
+                                height: 30px;
+                            }
+
+                        }
+                    }
+
+                    .quiz_inside_area_3 {
+                        display: flex;
+
+                    }
+
+                    .quiz_inside_area_4 {
+                        display: flex;
+
+                    }
+                }
+            }
+        }
+    }
+}
+</style>
+
+<script>
+export default {
+    data() {
+        return {
+            quizTypeList: [
+                ["單選題", "radio"],
+                ["多選題", "checkBox"],
+                ["簡答題", "textArea"],
+            ],
+            selectedQuizType: "radio",
+            answerList: [""],
         }
     },
-    methods:{
-
+    methods: {
+        quizTypeChange() {
+            this.answerList = [""]
+            this.selectedQuizType = quiz_type_select.value
+        },
+        addAnswer() {
+            this.answerList.push("")
+        },
+        check() {
+            console.log(this.answerList);
+        }
     },
 }
 </script>
-
-<style scoped lang="scss">
-    .main{
-        width: 100vw;
-        height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        .content{
-            width: 70%;
-            height: 75%;
-            border: 1px solid black;
-        }
-    }
-</style>
