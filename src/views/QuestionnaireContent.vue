@@ -8,19 +8,19 @@
                     <div class="information">
                         <div class="information_inside_area_1">
                             <p class="form_name_text form_information_text">問卷名稱：</p>
-                            <input class="form_name_input form_input">
+                            <input class="form_name_input form_input" v-model="this.quizData.quizName">
                         </div>
                         <div class="information_inside_area_2">
                             <p class="form_description_text form_information_text">問卷說明：</p>
-                            <textarea class="form_description_input form_input"></textarea>
+                            <textarea class="form_description_input form_input" v-model="this.quizData.quizDescription"></textarea>
                         </div>
                         <div class="information_inside_area_3">
                             <p class="form_startTime_text form_information_text">開始時間：</p>
-                            <input type="date" class="form_startTime_input form_input">
+                            <input type="date" class="form_startTime_input form_input" v-model="this.quizData.quizStartTime">
                         </div>
                         <div class="information_inside_area_4">
                             <p class="form_endTime_text form_information_text">結束時間：</p>
-                            <input type="date" class="form_endTime_input form_input">
+                            <input type="date" class="form_endTime_input form_input" v-model="this.quizData.quizEndTime">
                         </div>
                         <div class="information_inside_area_5">
                             <button class="form_cancel_button font_button">取消</button>
@@ -46,21 +46,26 @@
                         <div class="quiz_inside_area_2">
                             <div class="quiz_div" v-if="selectedQuizType == 'radio'">
                                 <div class="quiz_type_radio_div">
-                                    <input class="quiz_answer_input" v-for="(item, index) in answerList"
-                                        v-model="answerList[index]" @input="check()">
-                                        <button class="add_answer_button" @click="addAnswer()">增加選項</button>
+                                    <div v-for="(item, index) in answerList">
+                                        <input class="quiz_answer_input" v-model="answerList[index]" @input="check()">
+                                        <i class="fa-solid fa-xmark" @click="deleteAnswer(index)"></i>
+                                    </div>
+                                    <button class="add_answer_button" @click="addAnswer()">增加選項</button>
                                 </div>
                             </div>
                             <div class="quiz_div" v-if="selectedQuizType == 'checkBox'">
                                 <div class="quiz_type_checkBox_div">
-                                    <input class="quiz_answer_input" v-for="(item, index) in answerList"
-                                        v-model="answerList[index]" @input="check()">
-                                        <button class="add_answer_button" @click="addAnswer()">增加選項</button>
+                                    <div v-for="(item, index) in answerList">
+                                        <input class="quiz_answer_input" v-model="answerList[index]" @input="check()">
+                                        <i class="fa-solid fa-xmark" @click="deleteAnswer(index)"></i>
+                                    </div>
+                                    <button class="add_answer_button" @click="addAnswer()">增加選項</button>
                                 </div>
                             </div>
                             <div class="quiz_type_textArea_div" v-if="selectedQuizType == 'textArea'">
-
+                                <textarea class="quiz_answer_textArea" v-model="answerList[0]" @input="check()"></textarea>
                             </div>
+                            <button class="addInQuizData">加入題庫</button>
 
                         </div>
                         <div class="quiz_inside_area_3">
@@ -217,17 +222,17 @@
                             margin-right: 10px;
                             margin-left: 10px;
                         }
-                        .quiz_type_select{
+
+                        .quiz_type_select {
                             margin-top: 20px;
                             margin-right: 10px;
                             margin-left: 10px;
                             height: 30px;
-                            
+
                         }
                     }
 
                     .quiz_inside_area_2 {
-                        display: flex;
 
                         .quiz_div {
 
@@ -251,9 +256,6 @@
                                 }
                             }
 
-                            .quiz_type_textArea_div {
-                                width: 50%;
-                            }
 
                             .add_answer_button {
                                 margin-top: 5px;
@@ -262,6 +264,24 @@
                                 height: 30px;
                             }
 
+                        }
+
+                        .quiz_type_textArea_div {
+                            width: 100%;
+                            margin-left: 10px;
+
+                            .quiz_answer_textArea {
+                                height: 150px;
+                                width: 400px;
+                                resize: none;
+                            }
+                        }
+
+                        .addInQuizData {
+                            height: 50px;
+                            width: 100px;
+                            float: right;
+                            margin-right: 20px;
                         }
                     }
 
@@ -292,9 +312,20 @@ export default {
             ],
             selectedQuizType: "radio",
             answerList: [""],
+            quizData:{},
+            
         }
     },
     methods: {
+        quizDataInit(){
+            this.quizData = {
+                quizName:"",
+                quizDescription:"",
+                quizStartTime:"",
+                quizEndTime:"",
+                quiz:[],
+            }
+        },
         quizTypeChange() {
             this.answerList = [""]
             this.selectedQuizType = quiz_type_select.value
@@ -302,9 +333,22 @@ export default {
         addAnswer() {
             this.answerList.push("")
         },
+        deleteAnswer(index) {
+            if (this.answerList.length > 1) {
+                this.answerList.splice(index, 1)
+                return;
+            }
+            alert("最少需要有一個答案")
+        },
         check() {
             console.log(this.answerList);
+        },
+        check2() {
+            console.log(this.quizData);
         }
     },
+    mounted(){
+        this.quizDataInit() //將問卷資料物件初始化成想要的樣子
+    }
 }
 </script>
