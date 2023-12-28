@@ -9,9 +9,19 @@ const router = createRouter({
       component: () => import('../views/Questionnaire.vue')
     },
     {
+      path: '/QuestionnaireManage',
+      name: 'QuestionnaireManage',
+      component: () => import('../views/QuestionnaireManage.vue')
+    },
+    {
       path:'/QuestionnaireContent',
       name:'QuestionnaireContent',
       component:() => import('../views/QuestionnaireContent.vue')
+    },
+    {
+      path:'/QuestionnaireConfirm',
+      name:'QuestionnaireConfirm',
+      component:() => import('../views/QuestionnaireConfirm.vue')
     },
   ]
 })

@@ -3,10 +3,42 @@
         <div>
             <el-dialog v-model="dialogController">
                 <div>
+                    {{ this.quizData }}
+                    <br>
                     {{ this.editData }}
                     <div>
                         <p class="form_quiz_text quiz_text">問題：</p>
-                        <input class="form_quiz_input quiz_title" v-model="editData.questionTitle">
+                        <input v-model="this.editData.title">
+                        <select id="editSelectTitle" v-model="this.editData.type" @change="edittypeChange()">
+                            <option v-for="item in quizTypeList" :value="item[0]">{{ item[0] }}</option>
+                        </select>
+                        <input type="checkbox" id="editPublishedCheck" class="editPublishedCheck"
+                            v-model="this.editData.necessary">
+                        <span class="editPublishedText">必填</span>
+                    </div>
+                    <div v-if="editData.type == '單選題'">
+                        <div>
+                            <div v-for="(item, index) in editData.options">
+                                <input v-model="editData.options[index]" @input="check()">
+                                <i class="fa-solid fa-xmark" @click="editDeleteAnswer(index)"></i>
+                            </div>
+                            <button @click="addAnswer()">增加選項</button>
+                        </div>
+                    </div>
+                    <div v-if="editData.type == '多選題'">
+                        <div>
+                            <div v-for="(item, index) in editData.options">
+                                <input v-model="editData.options[index]" @input="check()">
+                                <i class="fa-solid fa-xmark" @click="editDeleteAnswer(index)"></i>
+                            </div>
+                            <button @click="addAnswer()">增加選項</button>
+                        </div>
+                    </div>
+                    <div v-if="editData.type == '簡答題'">
+                    </div>
+                    <div>
+                        <el-button @click="this.dialogController = false">取消</el-button>
+                        <el-button type="primary" @click="this.editQusetionSave()">儲存</el-button>
                     </div>
                 </div>
             </el-dialog>
@@ -19,23 +51,25 @@
                     <div class="information">
                         <div class="information_inside_area_1">
                             <p class="form_name_text form_information_text">問卷名稱：</p>
-                            <input class="form_name_input form_input">
+                            <input class="form_name_input form_input" v-model="this.quizData.quizTitle">
                         </div>
                         <div class="information_inside_area_2">
                             <p class="form_description_text form_information_text">問卷說明：</p>
-                            <textarea class="form_description_input form_input"></textarea>
+                            <textarea class="form_description_input form_input"
+                                v-model="this.quizData.quizDirections"></textarea>
                         </div>
                         <div class="information_inside_area_3">
                             <p class="form_startTime_text form_information_text">開始時間：</p>
-                            <input type="date" class="form_startTime_input form_input">
+                            <input type="date" class="form_startTime_input form_input"
+                                v-model="this.quizData.quizStartDate">
                         </div>
                         <div class="information_inside_area_4">
                             <p class="form_endTime_text form_information_text">結束時間：</p>
-                            <input type="date" class="form_endTime_input form_input">
+                            <input type="date" class="form_endTime_input form_input" v-model="this.quizData.quizEndDate">
                         </div>
                         <div class="information_inside_area_5">
                             <button class="form_cancel_button font_button">取消</button>
-                            <button class="form_next_button font_button">下一步</button>
+                            <button class="form_next_button font_button" @click="nextPage()">下一步</button>
                         </div>
                     </div>
                 </div>
@@ -48,44 +82,44 @@
                     <div class="quiz">
                         <div class="quiz_inside_area_1">
                             <p class="form_quiz_text quiz_text">問題：</p>
-                            <input class="form_quiz_input quiz_title" v-model="questionData.questionTitle">
-                            <select id="quiz_type_select" class="quiz_type_select" @change="questionTypeChange()">
-                                <option v-for="item in quizTypeList" :value="item[1]">{{ item[0] }}</option>
+                            <input class="form_quiz_input quiz_title" v-model="questionData.title">
+                            <select id="quiz_type_select" class="quiz_type_select" @change="typeChange()">
+                                <option v-for="item in quizTypeList" :value="item[0]">{{ item[0] }}</option>
                             </select>
-                            <input type="checkbox" class="publishedCheck" v-model="this.questionData.ispublished">
+                            <input type="checkbox" class="publishedCheck" v-model="this.questionData.necessary">
                             <span class="publishedText">必填</span>
                         </div>
                         <p class="form_quiz_text">選項：</p>
                         <div class="quiz_inside_area_2">
-                            <div class="quiz_div" v-if="questionData.questionType == '單選題'">
+                            <div class="quiz_div" v-if="questionData.type == '單選題'">
                                 <div class="quiz_type_radio_div">
-                                    <div v-for="(item, index) in questionData.questionOptions">
-                                        <input class="quiz_answer_input" v-model="questionData.questionOptions[index]"
+                                    <div v-for="(item, index) in questionData.options">
+                                        <input class="quiz_answer_input" v-model="questionData.options[index]"
                                             @input="check()">
                                         <i class="fa-solid fa-xmark" @click="deleteAnswer(index)"></i>
                                     </div>
                                     <button class="add_answer_button" @click="addAnswer()">增加選項</button>
                                 </div>
                             </div>
-                            <div class="quiz_div" v-if="questionData.questionType == '多選題'">
+                            <div class="quiz_div" v-if="questionData.type == '多選題'">
                                 <div class="quiz_type_checkBox_div">
-                                    <div v-for="(item, index) in questionData.questionOptions">
-                                        <input class="quiz_answer_input" v-model="questionData.questionOptions[index]"
+                                    <div v-for="(item, index) in questionData.options">
+                                        <input class="quiz_answer_input" v-model="questionData.options[index]"
                                             @input="check()">
                                         <i class="fa-solid fa-xmark" @click="deleteAnswer(index)"></i>
                                     </div>
                                     <button class="add_answer_button" @click="addAnswer()">增加選項</button>
                                 </div>
                             </div>
-                            <div class="quiz_type_textArea_div" v-if="questionData.questionType == '簡答題'">
-                                <!-- <textarea class="quiz_answer_textArea" v-model="questionData.questionOptions[0]"
+                            <div class="quiz_type_textArea_div" v-if="questionData.type == '簡答題'">
+                                <!-- <textarea class="quiz_answer_textArea" v-model="questionData.options[0]"
                                     @input="check()"></textarea> -->
                             </div>
 
                         </div>
                         <div class="quiz_inside_area_3">
                             <i class="fa-solid fa-trash-can" @click="deleteQuestion()"></i>
-                            <button class="addInQuizData" @click="addQuestionList()">加入題庫</button>
+                            <button class="addInQuizData" @click="addQuizQuestion()">加入題庫</button>
                         </div>
                         <div class="quiz_inside_area_4">
                             <table class="quizDataArea">
@@ -93,27 +127,27 @@
                                     <td class="deleteTd"></td>
                                     <td class="numberTd">編號</td>
                                     <td class="titleTd">問題</td>
-                                    <td class="questionTypeTd">問題種類</td>
+                                    <td class="typeTd">問題種類</td>
                                     <td class="publishedTd">必填</td>
                                     <td class="editTd">編輯</td>
                                 </tr>
-                                <tr v-for="(item, index) in questionList">
+                                <tr v-for="(item, index) in quizData.quizQuestion">
                                     <td class="deleteTd"><input type="checkbox" v-model="this.deleteList" :value="index">
                                     </td>
                                     <td class="numberTd">{{ index + 1 }}</td>
-                                    <td style="word-break:break-all;">{{ item.questionTitle }}</td>
-                                    <td class="questionTypeTd">{{ item.questionType }}</td>
-                                    <td class="publishedTd" v-if="item.ispublished == true"><i class="fa-solid fa-o"></i>
+                                    <td style="word-break:break-all;">{{ item.title }}</td>
+                                    <td class="typeTd">{{ item.type }}</td>
+                                    <td class="publishedTd" v-if="item.necessary == true"><i class="fa-solid fa-o"></i>
                                     </td>
-                                    <td class="publishedTd" v-if="item.ispublished == ''"><i class="fa-solid fa-x"></i></td>
+                                    <td class="publishedTd" v-if="item.necessary == ''"><i class="fa-solid fa-x"></i></td>
                                     <td class="editTd"><a href="javascript:void(0)" @click="editQuestion(index)">編輯</a></td>
                                 </tr>
 
                             </table>
                         </div>
                         <div class="quiz_inside_area_5">
-                            <button class="backBtn">上一步</button>
-                            <button class="previewBtn">預覽問卷</button>
+                            <button class="backBtn" @click="backPage()">上一步</button>
+                            <button class="previewBtn" @click="confirmQuiz()">預覽問卷</button>
                         </div>
                     </div>
                 </div>
@@ -137,6 +171,10 @@
     width: 100vw;
     height: 100vh;
     display: flex;
+
+    .editDialog {
+        z-index: 10;
+    }
 
     .outer {
         width: 100%;
@@ -373,7 +411,7 @@
                                 text-align: center;
                             }
 
-                            .questionTypeTd {
+                            .typeTd {
                                 text-align: center;
                                 width: 10%;
                             }
@@ -410,6 +448,7 @@
 
 <script>
 import QuestionEditDialog from '../components/questionEditDialog.vue'
+import Swal from 'sweetalert2'
 
 export default {
     data() {
@@ -419,19 +458,27 @@ export default {
                 ["多選題", "checkBox"],
                 ["簡答題", "textArea"],
             ],
-            questionList: [],
+            quizData: {
+                quizTitle: "",
+                quizDirections: "",
+                quizStartDate: "",
+                quizEndDate: "",
+                quizQuestion: []
+            },
             questionData: {
-                questionTitle: "",
-                questionType: "單選題",
-                ispublished: "",
-                questionOptions: [""],
+                title: "",
+                type: "單選題",
+                necessary: "",
+                options: [""],
             },
             deleteList: [],
+            editQuizType: "",
             editData: {
-                questionTitle: "",
-                questionType: "",
-                ispublished: "",
-                questionOptions: [""],
+                editIndex: "",
+                title: "",
+                type: "",
+                necessary: "",
+                options: [],
             },
             dialogController: false,
 
@@ -443,30 +490,52 @@ export default {
     methods: {
         questionDataInit() {
             this.questionData = {
-                questionTitle: "",
-                ispublished: "",
-                questionType: quiz_type_select.selectedOptions[0].innerText,
-                questionOptions: [""],
+                title: "",
+                necessary: "",
+                type: quiz_type_select.selectedOptions[0].innerText,
+                options: [""],
             }
         },
-        questionTypeChange() {
-            this.questionData.questionType = quiz_type_select.selectedOptions[0].innerText,
-                this.questionData.questionOptions = [""]
+        typeChange() {
+            this.questionData.type = quiz_type_select.selectedOptions[0].innerText,
+                this.questionData.options = [""]
+        },
+        edittypeChange() {
+            this.editData.type = editSelectTitle.selectedOptions[0].innerText
+            console.log(this.editData.type);
+            if ((this.editData.options.length <= 0) && (this.editData.type == "單選題" || this.editData.type == "多選題")) {
+                console.log("123");
+                this.editData.options.push("")
+            }
         },
         addAnswer() {
-            this.questionData.questionOptions.push("")
+            switch (this.dialogController) {
+                case true:
+                    this.editData.options.push("")
+                    break;
+                case false:
+                    this.questionData.options.push("")
+                    break;
+            }
         },
         deleteAnswer(index) {
-            if (this.questionData.questionOptions.length > 1) {
-                this.questionData.questionOptions.splice(index, 1)
+            if (this.questionData.options.length > 1) {
+                this.questionData.options.splice(index, 1)
                 return;
             }
             alert("最少需要有一個答案")
         },
-        addQuestionList() {
-            this.questionList.push(this.questionData);
+        editDeleteAnswer(index) {
+            if (this.editData.options.length > 1) {
+                this.editData.options.splice(index, 1)
+                return;
+            }
+            alert("最少需要有一個答案")
+        },
+        addQuizQuestion() {
+            this.quizData.quizQuestion.push(this.questionData);
             this.questionDataInit();
-            console.log(this.questionList);
+            console.log(this.quizData);
         },
         deleteQuestion() {
             this.deleteList.sort(function (a, b) {
@@ -477,25 +546,56 @@ export default {
                 }
             })
             for (let i = 0; i < this.deleteList.length; i++) {
-                this.questionList.splice(this.deleteList[i], 1)
+                this.quizData.quizQuestion.splice(this.deleteList[i], 1)
             }
             this.deleteList = []
         },
         editQuestion(index) {
-            if (!(this.questionList[index])) {
+            console.log(this.quizData.quizQuestion[index]);
+            this.editData.options = []
+            this.editData.editIndex = index
+            this.editData.title = this.quizData.quizQuestion[index].title
+            this.editData.type = this.quizData.quizQuestion[index].type
+            this.editData.necessary = this.quizData.quizQuestion[index].necessary
+            for (let i = 0; i < this.quizData.quizQuestion[index].options.length; i++) {
+                this.editData.options.push(this.quizData.quizQuestion[index].options[i])
+            }
+            this.dialogController = true
+        },
+        editQusetionSave() {
+            if (this.editData.editIndex == "" && this.editData.editIndex != 0) {
+                this.dialogController = false
+                console.log("editQusetionSave()的return");
                 return
             }
-            this.editData.questionTitle = this.questionList[index].questionTitle
-            this.editData.questionType = this.questionList[index].questionType
-            this.editData.ispublished = this.questionList[index].ispublished
-            this.editData.questionOptions = this.questionList[index].questionOptions
-            this.dialogController = true;
+            this.quizData.quizQuestion[this.editData.editIndex].title = this.editData.title
+            this.quizData.quizQuestion[this.editData.editIndex].type = this.editData.type
+            this.quizData.quizQuestion[this.editData.editIndex].necessary = this.editData.necessary
+            this.quizData.quizQuestion[this.editData.editIndex].options = []
+            for (let i = 0; i < this.editData.options.length; i++) {
+                this.quizData.quizQuestion[this.editData.editIndex].options.push(this.editData.options[i])
+            }
+            if (this.quizData.quizQuestion[this.editData.editIndex].type == "簡答題") {
+                this.quizData.quizQuestion[this.editData.editIndex].options = []
+            }
+            this.dialogController = false
+
+        },
+        nextPage() {
+            document.getElementById("tab-2").checked = true
+        },
+        backPage() {
+            document.getElementById("tab-1").checked = true
+        },
+        confirmQuiz() {
+            localStorage.setItem("quizData", JSON.stringify(this.quizData))
+            this.$router.push('QuestionnaireConfirm')
         },
         check() {
             console.log(this.questionData);
         },
-        check2() {
-            console.log(this.quizData);
+        check3() {
+            console.log(this.editData);
         }
     },
     mounted() {
