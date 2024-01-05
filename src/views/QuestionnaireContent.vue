@@ -3,9 +3,6 @@
         <div>
             <el-dialog v-model="dialogController">
                 <div>
-                    {{ this.quizData }}
-                    <br>
-                    {{ this.editData }}
                     <div>
                         <p class="form_quiz_text quiz_text">問題：</p>
                         <input v-model="this.editData.title">
@@ -19,7 +16,7 @@
                     <div v-if="editData.type == '單選題'">
                         <div>
                             <div v-for="(item, index) in editData.options">
-                                <input v-model="editData.options[index]" @input="check()">
+                                <input v-model="editData.options[index]">
                                 <i class="fa-solid fa-xmark" @click="editDeleteAnswer(index)"></i>
                             </div>
                             <button @click="addAnswer()">增加選項</button>
@@ -28,7 +25,7 @@
                     <div v-if="editData.type == '多選題'">
                         <div>
                             <div v-for="(item, index) in editData.options">
-                                <input v-model="editData.options[index]" @input="check()">
+                                <input v-model="editData.options[index]">
                                 <i class="fa-solid fa-xmark" @click="editDeleteAnswer(index)"></i>
                             </div>
                             <button @click="addAnswer()">增加選項</button>
@@ -94,8 +91,7 @@
                             <div class="quiz_div" v-if="questionData.type == '單選題'">
                                 <div class="quiz_type_radio_div">
                                     <div v-for="(item, index) in questionData.options">
-                                        <input class="quiz_answer_input" v-model="questionData.options[index]"
-                                            @input="check()">
+                                        <input class="quiz_answer_input" v-model="questionData.options[index]">
                                         <i class="fa-solid fa-xmark" @click="deleteAnswer(index)"></i>
                                     </div>
                                     <button class="add_answer_button" @click="addAnswer()">增加選項</button>
@@ -104,8 +100,7 @@
                             <div class="quiz_div" v-if="questionData.type == '多選題'">
                                 <div class="quiz_type_checkBox_div">
                                     <div v-for="(item, index) in questionData.options">
-                                        <input class="quiz_answer_input" v-model="questionData.options[index]"
-                                            @input="check()">
+                                        <input class="quiz_answer_input" v-model="questionData.options[index]">
                                         <i class="fa-solid fa-xmark" @click="deleteAnswer(index)"></i>
                                     </div>
                                     <button class="add_answer_button" @click="addAnswer()">增加選項</button>
@@ -459,6 +454,7 @@ export default {
                 ["簡答題", "textArea"],
             ],
             quizData: {
+                quizNum:null,
                 quizTitle: "",
                 quizDirections: "",
                 quizStartDate: "",
@@ -589,7 +585,39 @@ export default {
         },
         confirmQuiz() {
             localStorage.setItem("quizData", JSON.stringify(this.quizData))
-            this.$router.push('QuestionnaireConfirm')
+            this.$router.push('/QuestionnaireConfirm')
+        },
+        getDataByQuizNum(quizNum) {
+            fetch('http://localhost:8080/quiz/get_data_by_num',
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        num: quizNum,
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if(data.code == 200){
+                        this.quizData.quizTitle = data.quizList[0].name
+                        this.quizData.quizDirections = data.quizList[0].description
+                        this.quizData.quizStartDate = data.quizList[0].startDate
+                        this.quizData.quizEndDate = data.quizList[0].endDate
+                        let array = [];
+                        array = JSON.parse(data.quizList[0].questionStr)
+                        for(let i = 0;array.length;i++){
+                            this.quizData.quizQuestion.push({
+                                title:array[i].title,
+                                type:array[i].type,
+                                necessary:array[i].necessary,
+                                options:JSON.parse(array[i].options)
+                            })
+                        }
+                    }
+                })
         },
         check() {
             console.log(this.questionData);
@@ -599,6 +627,16 @@ export default {
         }
     },
     mounted() {
-    }
+        switch (true) {
+            case this.$route.name == "QuestionnaireEdit" && this.$route.params.quizNum >= 0:
+                console.log("這是編輯問卷" + this.$route.params.quizNum + "的頁面");
+                this.getDataByQuizNum(this.$route.params.quizNum);
+                this.quizData.quizNum = this.$route.params.quizNum;
+                break;
+            case this.$route.name == "QuestionnaireCreate":
+                console.log("這是新建問卷的頁面");
+                break;
+        }
+0    }
 }
 </script>

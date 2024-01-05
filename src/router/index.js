@@ -14,8 +14,8 @@ const router = createRouter({
       component: () => import('../views/QuestionnaireManage.vue')
     },
     {
-      path:'/QuestionnaireContent',
-      name:'QuestionnaireContent',
+      path:'/QuestionnaireCreate',
+      name:'QuestionnaireCreate',
       component:() => import('../views/QuestionnaireContent.vue')
     },
     {
@@ -23,6 +23,21 @@ const router = createRouter({
       name:'QuestionnaireConfirm',
       component:() => import('../views/QuestionnaireConfirm.vue')
     },
+    {
+      path:'/Login',
+      name:'Login',
+      component:() => import('../views/Login.vue')
+    },
+    {
+      path:'/QuestionnaireEdit/:quizNum',
+      name:'QuestionnaireEdit',
+      component:() => import('../views/QuestionnaireContent.vue')
+    },
+    {
+      path:'/QuestionnaireFilling/:quizNum',
+      name:'QuestionnaireFilling',
+      component:() => import('../views/QuestionnaireFilling.vue')
+    }
   ]
 })
 
